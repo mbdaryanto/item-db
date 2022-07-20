@@ -12,7 +12,9 @@ export const typeDefs = gql`
 
   type Mutation {
     "Create new item"
-    createItem(barcode: String!, name: String!, description: String, sellingPrice: Float!): Item!
+    createItem(barcode: String!, name: String!, description: String, sellingPrice: Float!): CreateUpdateItemResponse!
+    "Update item"
+    updateItem(id: ID!, barcode: String!, name: String!, description: String, sellingPrice: Float!): CreateUpdateItemResponse!
   }
 
   type Item {
@@ -21,5 +23,16 @@ export const typeDefs = gql`
     name: String!
     description: String
     sellingPrice: Float!
+  }
+
+  type CreateUpdateItemResponse {
+    "Similar to HTTP status code, represents the status of the mutation"
+    code: Int!
+    "Indicates whether the mutation was successful"
+    success: Boolean!
+    "Human-readable message for the UI"
+    message: String!
+    "Newly updated item after a successful mutation"
+    item: Item
   }
 `
