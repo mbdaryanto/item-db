@@ -1,25 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { ChakraProvider } from '@chakra-ui/react'
+import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client'
+import ErrorBoundary from './components/ErrorBoundary'
+import HomePage from './pages/Home';
+import LayoutPage from './pages/Layout';
+import ItemListPage from './pages/ItemList';
+import ItemPage from './pages/Item';
+
+
+const client = new ApolloClient({
+  uri: () => 'http://localhost:4000/',
+  cache: new InMemoryCache(),
+})
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ErrorBoundary>
+      <Router>
+        <ChakraProvider>
+          <ApolloProvider client={client}>
+            <Routes>
+              <Route path="/" element={<LayoutPage/>}>
+                <Route index element={<HomePage/>}/>
+                <Route path="item">
+                  <Route index element={<ItemListPage/>}/>
+                  <Route path=":itemId" element={<ItemPage/>}/>
+                </Route>
+              </Route>
+            </Routes>
+          </ApolloProvider>
+        </ChakraProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
