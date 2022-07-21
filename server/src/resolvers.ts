@@ -44,7 +44,7 @@ const resolvers = {
           item
         }
       } catch (err) {
-        console.log('Error createItem', err)
+        // console.log('Error createItem', err)
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
           // The .code property can be accessed in a type-safe manner
           if (err.code === 'P2002') {
@@ -92,7 +92,7 @@ const resolvers = {
           item
         }
       } catch (err) {
-        console.log('Error updateItem', err)
+        // console.log('Error updateItem', err)
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
           // The .code property can be accessed in a type-safe manner
           if (err.code === 'P2002') {
