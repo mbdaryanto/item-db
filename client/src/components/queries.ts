@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client"
 
+
 export const CORE_ITEM_FIELDS = gql`
   fragment CoreItemFields on Item {
     id
@@ -21,9 +22,46 @@ export const GET_ITEMS = gql`
 
 export const GET_ITEM = gql`
   ${CORE_ITEM_FIELDS}
-  query GetItem($itemId: ID!) {
-    item: getItem(id: $itemId) {
+  query GetItem($id: ID!) {
+    item: getItem(id: $id) {
       ...CoreItemFields
+    }
+  }
+`
+
+export const GET_ITEM_BY_BARCODE = gql`
+  ${CORE_ITEM_FIELDS}
+  query GetItemByBarcode($barcode: String!) {
+    item: getItemByBarcode(barcode: $barcode) {
+      ...CoreItemFields
+    }
+  }
+`
+
+export const CREATE_ITEM = gql`
+  ${CORE_ITEM_FIELDS}
+  mutation CreateItem($barcode: String!, $name: String!, $sellingPrice: Float!, $description: String) {
+    createItem(barcode: $barcode, name: $name, sellingPrice: $sellingPrice, description: $description) {
+      code
+      success
+      message
+      item {
+        ...CoreItemFields
+      }
+    }
+  }
+`
+
+export const UPDATE_ITEM = gql`
+  ${CORE_ITEM_FIELDS}
+  mutation UpdateItem($id: ID!, $barcode: String!, $name: String!, $sellingPrice: Float!, $description: String) {
+    updateItem(id: $id, barcode: $barcode, name: $name, sellingPrice: $sellingPrice, description: $description) {
+      code
+      success
+      message
+      item {
+        ...CoreItemFields
+      }
     }
   }
 `
@@ -41,9 +79,30 @@ export interface GetItemsResultType {
 }
 
 export interface GetItemVarType {
-  itemId: string
+  id: string
 }
 
 export interface GetItemResultType {
   item?: ItemType
 }
+
+export interface GetItemByBarcodeVarType {
+  barcode: string
+}
+
+export interface GetItemByBarcodeResultType {
+  item?: ItemType
+}
+
+export type UpdateItemVarType = ItemType
+
+export interface UpdateItemResponseType {
+  code: number
+  success: boolean
+  message: string
+  item?: ItemType
+}
+
+export type CreateItemVarType = Omit<ItemType, 'id'>
+
+export type CreateItemResponseType = UpdateItemResponseType
