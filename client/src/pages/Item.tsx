@@ -1,7 +1,8 @@
-import { useParams } from "react-router-dom"
+import { ComponentProps } from "react"
+import { useParams, Link } from "react-router-dom"
 import { useQuery, useMutation } from "@apollo/client"
 import { Formik, Form, Field, FieldProps } from "formik"
-import { Button, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react"
+import { Button, FormControl, FormErrorMessage, FormLabel, Heading, HStack, Input, VStack } from "@chakra-ui/react"
 import { GET_ITEM, GetItemResultType, GetItemVarType, UPDATE_ITEM, UpdateItemVarType, UpdateItemResponseType } from "../components/queries"
 import QueryResult from "../components/QueryResult"
 import * as yup from "yup"
@@ -17,6 +18,10 @@ const itemSchema = yup.object({
 const updateItemSchema = itemSchema.shape({
   id: yup.string().required(),
 })
+
+const inputProps: Partial<ComponentProps<typeof Input>> = {
+  boxShadow: "md",
+}
 
 
 function ItemPage() {
@@ -52,47 +57,53 @@ function ItemPage() {
         >
           {({ errors, isSubmitting }) => (
             <Form>
-              <Field name="barcode">
-                {({ field, meta }: FieldProps<string>) => (
-                  <FormControl isRequired isInvalid={!!meta.error && meta.touched}>
-                    <FormLabel>Barcode</FormLabel>
-                    <Input type="text" {...field}/>
-                    <FormErrorMessage>{ meta.error }</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
+              <VStack spacing="20px" align="start">
+                <Heading>Item</Heading>
+                <Field name="barcode">
+                  {({ field, meta }: FieldProps<string>) => (
+                    <FormControl isRequired isInvalid={!!meta.error && meta.touched}>
+                      <FormLabel>Barcode</FormLabel>
+                      <Input type="text" {...field} {...inputProps}/>
+                      <FormErrorMessage>{ meta.error }</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
 
-              <Field name="name">
-                {({ field, meta }: FieldProps<string>) => (
-                  <FormControl isRequired isInvalid={!!meta.error && meta.touched}>
-                    <FormLabel>Name</FormLabel>
-                    <Input type="text" {...field}/>
-                    <FormErrorMessage>{ meta.error }</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
+                <Field name="name">
+                  {({ field, meta }: FieldProps<string>) => (
+                    <FormControl isRequired isInvalid={!!meta.error && meta.touched}>
+                      <FormLabel>Name</FormLabel>
+                      <Input type="text" {...field} {...inputProps}/>
+                      <FormErrorMessage>{ meta.error }</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
 
-              <Field name="description">
-                {({ field, meta }: FieldProps<string>) => (
-                  <FormControl isInvalid={!!meta.error && meta.touched}>
-                    <FormLabel>Description</FormLabel>
-                    <Input type="text" {...field}/>
-                    <FormErrorMessage>{ meta.error }</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
+                <Field name="description">
+                  {({ field, meta }: FieldProps<string>) => (
+                    <FormControl isInvalid={!!meta.error && meta.touched}>
+                      <FormLabel>Description</FormLabel>
+                      <Input type="text" {...field} {...inputProps}/>
+                      <FormErrorMessage>{ meta.error }</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
 
-              <Field name="sellingPrice">
-                {({ field, meta }: FieldProps<string>) => (
-                  <FormControl isRequired isInvalid={!!meta.error && meta.touched}>
-                    <FormLabel>Selling Price</FormLabel>
-                    <Input type="text" {...field}/>
-                    <FormErrorMessage>{ meta.error }</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
+                <Field name="sellingPrice">
+                  {({ field, meta }: FieldProps<string>) => (
+                    <FormControl isRequired isInvalid={!!meta.error && meta.touched}>
+                      <FormLabel>Selling Price</FormLabel>
+                      <Input type="text" {...field} {...inputProps}/>
+                      <FormErrorMessage>{ meta.error }</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
 
-              <Button type="submit" isLoading={isSubmitting || updateItemStatus.loading} onClick={(ev) => console.log(errors)}>Save</Button>
+                <HStack spacing="8px">
+                  <Button type="submit" colorScheme="green" isLoading={isSubmitting || updateItemStatus.loading} onClick={(ev) => console.log(errors)}>Save</Button>
+                  <Button type="button" as={Link} to="/item">Back</Button>
+                </HStack>
+              </VStack>
             </Form>
           )}
         </Formik>

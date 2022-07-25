@@ -3,7 +3,7 @@ import { gql } from 'apollo-server'
 export const typeDefs = gql`
   type Query {
     "Get all items"
-    getItems: [Item!]!
+    getItems(term: String): [Item!]!
     "Get item by id"
     getItem(id: ID!): Item
     "Get item by barcode"

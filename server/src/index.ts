@@ -13,13 +13,18 @@ const server = new ApolloServer({
     return {
       prisma
     }
-  }
+  },
+  csrfPrevention: true,
+  cors: {
+    origin: ["http://localhost:3000", "https://studio.apollographql.com"]
+  },
 })
 
-server.listen().then(() => {
+server.listen().then(({ url }) => {
+  // port 4000
   console.log(`
     🚀  Server is running!
-    🔉  Listening on port 4000
+    🔉  Listening on ${url}
     📭  Query at https://studio.apollographql.com/sandbox/explorer
   `)
 })

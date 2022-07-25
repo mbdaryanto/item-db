@@ -2,10 +2,31 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 const resolvers = {
   Query: {
-    getItems: async (_: any, __: any, { prisma }: { prisma: PrismaClient }) => {
+    getItems: async (_: any, { term }: { term?: string }, { prisma }: { prisma: PrismaClient }) => {
       console.log('getItems resolver')
-      const items = await prisma.item.findMany()
-      return items
+      // let items = await prisma.item.findMany()
+      if (!term) {
+        return await prisma.item.findMany()
+      }
+      // find non empty keywords
+      const keywords = term.split(' ').filter(keyword => keyword)
+      if (keywords.length === 0) {
+        return await prisma.item.findMany()
+      }
+
+      const whereAnd = keywords.map(keyword => ({
+        OR: [
+          { 'barcode': { 'contains': keyword }, },
+          { 'name': { 'contains': keyword }, },
+          { 'description': { 'contains': keyword }, },
+        ]
+      }))
+
+      return await prisma.item.findMany({
+        where: {
+          AND: whereAnd
+        }
+      })
     },
     getItem: async (
       _: any, { id }: { id: string }, { prisma }: { prisma: PrismaClient }

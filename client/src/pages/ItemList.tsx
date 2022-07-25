@@ -1,42 +1,27 @@
-import { gql, useQuery } from '@apollo/client'
-import { Divider, LinkBox, LinkOverlay, List, ListItem, Text, VStack } from '@chakra-ui/react'
+import { useQuery } from '@apollo/client'
+import { Divider, Input, LinkBox, LinkOverlay, List, ListItem, Text, VStack } from '@chakra-ui/react'
 import { Fragment } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import { GetItemsResultType, GetItemsVarType, GET_ITEMS } from '../components/queries'
 import QueryResult from '../components/QueryResult'
 
-export const GET_ITEMS = gql`
-  query GetItems {
-    getItems {
-      id
-      barcode
-      name
-      description
-      sellingPrice
-    }
-  }
-`
-
-export interface ItemType {
-  id: string
-  barcode: string
-  name: string
-  description?: string
-  sellingPrice: number
-}
-
-export interface GetItemsResultType {
-  getItems: ItemType[]
-}
 
 export default function ItemListPage() {
-  const { error, loading, data } = useQuery<GetItemsResultType, {}>(GET_ITEMS)
+  const [ searchParams, setSearchParams ] = useSearchParams({ term: '' })
+  const { error, loading, data, refetch } = useQuery<GetItemsResultType, GetItemsVarType>(GET_ITEMS, {
+    variables: { term: searchParams.get('term') ?? '' }
+  })
 
   return (
     <VStack>
       <Text>Item List</Text>
+      <Input value={searchParams.get('term') ?? ''} onChange={ev => {
+        setSearchParams({ term: ev.target.value }, { replace: true })
+        refetch({ term: searchParams.get('term') ?? '' })
+      }} />
       <QueryResult error={error} loading={loading} data={data}>
         <List>
-          {!!data && data!.getItems.map(row => (
+          {!!data && data!.items.map(row => (
             <Fragment key={row.id}>
               <LinkBox
                 as={ListItem}

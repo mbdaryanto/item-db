@@ -13,8 +13,8 @@ export const CORE_ITEM_FIELDS = gql`
 
 export const GET_ITEMS = gql`
   ${CORE_ITEM_FIELDS}
-  query GetItems {
-    items: getItems {
+  query GetItems($term: String) {
+    items: getItems(term: $term) {
       ...CoreItemFields
     }
   }
@@ -72,6 +72,10 @@ export interface ItemType {
   name: string
   description?: string
   sellingPrice: number
+}
+
+export interface GetItemsVarType {
+  term?: string
 }
 
 export interface GetItemsResultType {
