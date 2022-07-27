@@ -2,7 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 const resolvers = {
   Query: {
-    getItems: async (_: any, { term }: { term?: string }, { prisma }: { prisma: PrismaClient }) => {
+    getItems: async (_: any, { term, take, skip }: { term?: string, take?: number, skip?: number }, { prisma }: { prisma: PrismaClient }) => {
       console.log('getItems resolver')
       // let items = await prisma.item.findMany()
       if (!term) {
@@ -25,7 +25,9 @@ const resolvers = {
       return await prisma.item.findMany({
         where: {
           AND: whereAnd
-        }
+        },
+        take: take ?? 20,
+        skip: skip ?? 0,
       })
     },
     getItem: async (
@@ -138,7 +140,51 @@ const resolvers = {
           item: null
         }
       }
-    }
+    },
+    deleteItem: async (
+      _: any,
+      { id }: {
+        id: string
+      },
+      { prisma }: {
+        prisma: PrismaClient
+      }
+    ) => {
+      try {
+        const item = await prisma.item.delete({ where: { id: parseInt(id) } })
+        return {
+          code: 200,
+          success: true,
+          message: `Successfully delete item id ${item.id}`,
+          item
+        }
+      } catch (err) {
+        // console.log('Error deleteItem', err)
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+          // The .code property can be accessed in a type-safe manner
+          // if (err.code === 'P2002') {
+          //   return {
+          //     code: 400,
+          //     success: false,
+          //     message: `Item with the same barcode already exists [${err.code}]`,
+          //     item: null
+          //   }
+          // }
+          return {
+            code: 400,
+            success: false,
+            message: `Error [${err.code}] ${err.message}`,
+            item: null
+          }
+        }
+        return {
+          code: 400,
+          success: false,
+          message: `Failed to delete item ${err}`,
+          item: null
+        }
+      }
+    },
   }
 }
 
