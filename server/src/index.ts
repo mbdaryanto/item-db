@@ -1,8 +1,9 @@
 import { ApolloServer } from 'apollo-server'
+import { PrismaClient } from '@prisma/client'
+import 'dotenv/config'
 
 import { typeDefs } from './schema'
 import resolvers from './resolvers'
-import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -20,8 +21,11 @@ const server = new ApolloServer({
   },
 })
 
+// console.log('env', process.env)
+const port = parseInt(process.env.SERVER_PORT || '4000')
+
 server.listen({
-  port: process.env['PORT']
+  port
 }).then(({ url }) => {
   // port 4000
   console.log(`
