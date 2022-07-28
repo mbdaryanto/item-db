@@ -3,15 +3,21 @@ import { Prisma, PrismaClient } from '@prisma/client'
 const resolvers = {
   Query: {
     getItems: async (_: any, { term, take, skip }: { term?: string, take?: number, skip?: number }, { prisma }: { prisma: PrismaClient }) => {
-      console.log('getItems resolver')
+      console.log('getItems resolver', { term, take, skip })
       // let items = await prisma.item.findMany()
       if (!term) {
-        return await prisma.item.findMany()
+        return await prisma.item.findMany({
+          take: take ?? 20,
+          skip: skip ?? 0,
+        })
       }
       // find non empty keywords
       const keywords = term.split(' ').filter(keyword => keyword)
       if (keywords.length === 0) {
-        return await prisma.item.findMany()
+        return await prisma.item.findMany({
+          take: take ?? 20,
+          skip: skip ?? 0,
+        })
       }
 
       const whereAnd = keywords.map(keyword => ({
