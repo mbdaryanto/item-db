@@ -1,5 +1,6 @@
 import { ApolloServer } from 'apollo-server'
 import { PrismaClient } from '@prisma/client'
+import { jwtVerify } from 'jose'
 import 'dotenv/config'
 
 import { typeDefs } from './schema'
@@ -10,9 +11,19 @@ const prisma = new PrismaClient()
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: () => {
+  context: async ({ req }) => {
+    let auth = null
+    const token = req.headers.authorization || ''
+    const accessToken = token.split(' ')[1] // get the access token after 'Bearer '
+    if (!!accessToken) {
+      const secretKey = Buffer.from(process.env.SECRET_KEY || '', 'base64url')
+      const { payload } = await jwtVerify(accessToken, secretKey)
+      // console.log(payload, protectedHeader)
+      auth = payload
+    }
     return {
-      prisma
+      prisma,
+      auth,
     }
   },
   csrfPrevention: true,
@@ -22,7 +33,7 @@ const server = new ApolloServer({
 })
 
 // console.log('env', process.env)
-const port = parseInt(process.env.SERVER_PORT || '4000')
+const port = Number(process.env.SERVER_PORT) || 4000
 
 server.listen({
   port

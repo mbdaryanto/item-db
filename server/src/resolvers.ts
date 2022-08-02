@@ -1,7 +1,26 @@
 import { Prisma, PrismaClient } from '@prisma/client'
+import { JWTPayload, jwtVerify, SignJWT } from 'jose'
 
 const resolvers = {
   Query: {
+    login: async(_: any, { user }: {user: string, password: string}) => {
+      const secretKey = Buffer.from(process.env.SECRET_KEY || '', 'base64url')
+      // console.log(secretKey)
+      const jwt = await new SignJWT({ user })
+        .setSubject(user)
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('2h')
+        .sign(secretKey)
+      // console.log(jwt)
+
+      const { payload, protectedHeader } = await jwtVerify(jwt, secretKey)
+      // console.log(payload, protectedHeader)
+
+      return {
+        accessToken: jwt
+      }
+    },
     getItems: async (_: any, { term, take, skip }: { term?: string, take?: number, skip?: number }, { prisma }: { prisma: PrismaClient }) => {
       console.log('getItems resolver', { term, take, skip })
       // let items = await prisma.item.findMany()
@@ -60,11 +79,13 @@ const resolvers = {
         description?: string
         sellingPrice: number
       },
-      { prisma }: {
+      { prisma, auth }: {
         prisma: PrismaClient
+        auth?: JWTPayload
       }
     ) => {
       try {
+        console.log(auth)
         const item = await prisma.item.create({ data })
         return {
           code: 200,

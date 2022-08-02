@@ -2,6 +2,8 @@ import { gql } from 'apollo-server'
 
 export const typeDefs = gql`
   type Query {
+    "Login"
+    login(user: String!, password: String!): LoginResponse!
     "Get all items"
     getItems(term: String, take: Int, skip: Int): [Item!]!
     "Get item by id"
@@ -25,6 +27,10 @@ export const typeDefs = gql`
     name: String!
     description: String
     sellingPrice: Float!
+  }
+
+  type LoginResponse {
+    accessToken: String!
   }
 
   type CreateUpdateItemResponse {
